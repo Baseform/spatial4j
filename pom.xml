@@ -82,6 +82,9 @@
     <!-- this magic system property is honored by many plugins: http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <!-- optional jackson support -->
+    <version.jackson.annotations>2.6.0</version.jackson.annotations>
+    <version.jackson.core>2.6.2</version.jackson.core>
   </properties>
 
   <!-- To check for new plugins and dependencies:
@@ -142,6 +145,26 @@
       <artifactId>randomizedtesting-runner</artifactId>
       <version>2.1.16</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- Optional support the Jackson Databinding -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${version.jackson.annotations}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${version.jackson.core}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${version.jackson.core}</version>
+      <optional>true</optional>
     </dependency>
 
   </dependencies>
@@ -267,6 +290,45 @@
           <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
         </configuration>
       </plugin>
+  
+      <plugin>
+        <!-- Generate PackageVersion.java for Jackson-->
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.3</version>
+        <executions>
+          <execution>
+            <id>process-packageVersion</id>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>replace</goal>
+            </goals>                    
+          </execution>
+        </executions>
+        <configuration>
+                <file>${basedir}/src/main/java/com/spatial4j/jackson/PackageVersion.java.in</file>
+          <outputFile>${basedir}/src/main/java/com/spatial4j/jackson/PackageVersion.java</outputFile>
+          <replacements>
+            <replacement>
+              <token>@package@</token>
+              <value>${packageVersion.package}</value>
+            </replacement>
+            <replacement>
+              <token>@projectversion@</token>
+              <value>${project.version}</value>
+            </replacement>
+            <replacement>
+              <token>@projectgroupid@</token>
+              <value>${project.groupId}</value>
+            </replacement>
+            <replacement>
+              <token>@projectartifactid@</token>
+              <value>${project.artifactId}</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+
     </plugins>
 
   </build>
